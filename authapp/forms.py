@@ -13,11 +13,11 @@ class UserLoginForm(AuthenticationForm):
         model = User
         fields = ('username', 'password')
 
-    def clean_username(self):
-        data = self.data['username']
-        if len(data) < 3:
-            raise forms.ValidationError("Слишком короткое имя пользователя!")
-        return data
+    # def clean_username(self):
+    #     data = self.data['username']
+    #     if len(data) < 3:
+    #         raise forms.ValidationError("Слишком короткое имя пользователя!")
+    #     return data
 
 class UserRegisterForm(UserCreationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={
