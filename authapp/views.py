@@ -1,9 +1,9 @@
 from django.shortcuts import render, HttpResponseRedirect
-from .forms import UserLoginForm, UserRegisterForm
+from .forms import UserLoginForm, UserRegisterForm, UserProfileForm
 from django.contrib import auth
 from django.urls import reverse
 from django.contrib import messages
-
+from basketapp.models import Basket
 
 def login(request):
     if request.method == 'POST':
@@ -19,6 +19,20 @@ def login(request):
         form = UserLoginForm()
     context = {'title': 'GeekShop - Авторизация', 'form': form}
     return render(request, 'authapp/login.html', context)
+
+
+def profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(data=request.POST, files=request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('users:profile'))
+    else:
+        form = UserProfileForm(instance=request.user)
+    context = {'title': 'GeekShop - Личный кабинет',
+               'baskets' : Basket.objects.all(),
+               'form': form}
+    return render(request, 'authapp/profile.html', context)
 
 
 def register(request):
