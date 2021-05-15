@@ -4,6 +4,7 @@ from django.contrib import auth
 from django.urls import reverse
 from django.contrib import messages
 from basketapp.models import Basket
+from django.contrib.auth.decorators import login_required
 
 def login(request):
     if request.method == 'POST':
@@ -20,7 +21,7 @@ def login(request):
     context = {'title': 'GeekShop - Авторизация', 'form': form}
     return render(request, 'authapp/login.html', context)
 
-
+@login_required
 def profile(request):
     if request.method == 'POST':
         form = UserProfileForm(data=request.POST, files=request.FILES, instance=request.user)
@@ -33,7 +34,6 @@ def profile(request):
                'baskets' : Basket.objects.all(),
                'form': form}
     return render(request, 'authapp/profile.html', context)
-
 
 def register(request):
     if request.method == 'POST':
