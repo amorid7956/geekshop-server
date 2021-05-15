@@ -27,11 +27,15 @@ def profile(request):
         form = UserProfileForm(data=request.POST, files=request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Данные успешно обновлены!')
             return HttpResponseRedirect(reverse('users:profile'))
     else:
         form = UserProfileForm(instance=request.user)
+    baskets = Basket.objects.filter(user=request.user)
     context = {'title': 'GeekShop - Личный кабинет',
-               'baskets' : Basket.objects.all(),
+               'baskets' : baskets,
+               'total_quantity' : baskets.first().total_quantity(),
+               'total_sum': baskets.first().total_sum(),
                'form': form}
     return render(request, 'authapp/profile.html', context)
 
