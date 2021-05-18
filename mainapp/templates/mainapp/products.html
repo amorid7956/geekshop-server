@@ -71,7 +71,9 @@
                             {% if product.is_danger %}
                             <button type="button" class="btn btn-outline-danger">Удалить из корзины</button>
                             {% else %}
+                            <a href="{% url 'baskets:basket_add' product.id %}">
                              <button type="button" class="btn btn-outline-success">Отправить в корзину</button>
+                              </a>
                             {% endif %}
                         </div>
                     </div>
