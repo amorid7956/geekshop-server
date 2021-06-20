@@ -5,6 +5,9 @@ from django.urls import reverse
 from django.contrib import messages
 from basketapp.models import Basket
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import User
 
 def login(request):
     if request.method == 'POST':
@@ -34,8 +37,8 @@ def profile(request):
     baskets = Basket.objects.filter(user=request.user)
     context = {'title': 'GeekShop - Личный кабинет',
                'baskets' : baskets,
-               'total_quantity' : baskets.first().total_quantity(),
-               'total_sum': baskets.first().total_sum(),
+               'total_quantity' : baskets.first().total_quantity() if baskets else 0,
+               'total_sum': baskets.first().total_sum() if baskets else 0,
                'form': form}
     return render(request, 'authapp/profile.html', context)
 
@@ -43,7 +46,8 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(data=request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            send_verify_link(user)
             messages.success(request, 'Вы успешно зарегистрировались!')
             return HttpResponseRedirect(reverse('users:login'))
     else:
@@ -55,3 +59,20 @@ def register(request):
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect(reverse('index'))
+
+
+def send_verify_link(user):
+    verify_link = reverse('users:verify',args=[user.email, user.activation_key])
+    subject = 'Account verify'
+    message = f'Your link for account activation: {settings.DOMAIN_NAME}{verify_link}'
+    return  send_mail(subject, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
+
+def verify(request, email, key):
+    user = User.objects.filter(email=email).first()
+    if user and user.activation_key == key and not user.is_activation_key_expired():
+        user.is_active = True
+        user.activation_key = ''
+        user.activation_key_created = None
+        user.save()
+        auth.login(request, user)
+    return render(request, 'authapp/verify.html')
