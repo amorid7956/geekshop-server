@@ -29,7 +29,7 @@ class UserCreateView(CreateView):
     @method_decorator(user_passes_test(lambda u: u.is_superuser))
     def dispatch(self, request, *args, **kwargs):
         return super(UserListView, self).dispatch(request, *args, **kwargs)
-    
+
 class UserUpdateView(UpdateView):
     model = User
     template_name = 'adminapp/admin-users-update-delete.html'
