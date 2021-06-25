@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect
-from .forms import UserLoginForm, UserRegisterForm, UserProfileForm
+from .forms import UserLoginForm, UserRegisterForm, UserProfileForm, UserProfileEditForm
 from django.contrib import auth
 from django.urls import reverse
 from django.contrib import messages
@@ -28,18 +28,22 @@ def login(request):
 def profile(request):
     if request.method == 'POST':
         form = UserProfileForm(data=request.POST, files=request.FILES, instance=request.user)
-        if form.is_valid():
+        profile_form = UserProfileEditForm(data=request.POST, instance=request.user.userprofile)
+        if form.is_valid() and profile_form.is_valid():
             form.save()
+            profile_form.save()
             messages.success(request, 'Данные успешно обновлены!')
             return HttpResponseRedirect(reverse('users:profile'))
     else:
         form = UserProfileForm(instance=request.user)
+        profile_form = UserProfileEditForm(instance=request.user.userprofile)
     baskets = Basket.objects.filter(user=request.user)
     context = {'title': 'GeekShop - Личный кабинет',
                'baskets' : baskets,
                'total_quantity' : baskets.first().total_quantity() if baskets else 0,
                'total_sum': baskets.first().total_sum() if baskets else 0,
-               'form': form}
+               'form': form,
+               'profile_form': profile_form}
     return render(request, 'authapp/profile.html', context)
 
 def register(request):
