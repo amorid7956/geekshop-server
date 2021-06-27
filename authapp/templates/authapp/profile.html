@@ -50,6 +50,10 @@
                        {{ form.email }}
                     </div>
                     <div class="col-lg-6">
+                        <label class="small mb-1" for="{{ form.age.id_for_label }}">Возраст</label>
+                       {{ form.age }}
+                    </div>
+                    <div class="col-lg-6">
                         <label class="small mb-1" for="{{ profile_form.tagline.id_for_label }}">Тэги</label>
                        {{ profile_form.tagline }}
                     </div>

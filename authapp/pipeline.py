@@ -5,14 +5,16 @@ from django.utils.timezone import now
 from social_core.exceptions import AuthForbidden
 
 def save_user_profile(backend, user, response, *args, **kwargs):
-    if backend != 'vk-oauth2':
+    if backend.name != 'vk-oauth2':
         return
 
-    api_url = f'https://api.vk.com/method/users.get?fields=bdate,sex,about&access_token={response["access_token"]}'
+    params = f'fields=bdate,sex,about&v=5.131&access_token={response["access_token"]}'
+    api_url = f'https://api.vk.com/method/users.get?{params}'
 
     vk_response = requests.get(api_url)
     if vk_response.status_code != 200:
         return
+    print(vk_response.json())
     vk_data = vk_response.json()['response'][0]
     if vk_data['sex']:
         if vk_data['sex'] == 2:
