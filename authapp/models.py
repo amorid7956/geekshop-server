@@ -30,11 +30,11 @@ class UserProfile(models.Model):
     about_me = models.TextField(verbose_name='О себе',max_length=512, blank=True)
     gender = models.CharField(choices=GENDER_CHOICES, blank=True, max_length=1, verbose_name='Пол')
 
-    # @receiver(post_save, sender=User)
-    # def create_user_profile(sender, created, instanse, **kwargs):
-    #     if created:
-    #         UserProfile.objects.create(user=instanse)
-    #
-    # @receiver(post_save, sender=User)
-    # def save_user_profile(sender, instanse, **kwargs):
-    #     instanse.userprofile.save()
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, created, instance, **kwargs):
+        if created:
+            UserProfile.objects.create(user=instance)
+
+    @receiver(post_save, sender=User)
+    def save_user_profile(sender, instance, **kwargs):
+        instance.userprofile.save()
